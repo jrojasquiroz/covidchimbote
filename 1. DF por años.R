@@ -2,6 +2,9 @@
 #Para ver cómo jalar correctamente datos con fechas
 #revisar esto: https://estadisticamente.com/trabajando-con-fechas-en-r/
 
+#Este fue el script inicial. Jalo info por años (primero pruebo con muertes pre-pandemia como la unión de 2018-2019, y luego solo 2019 repitiendo la cantidad
+#de muertos de 2019 y recalculando la media móvil en Excel.
+
 #1. Jalamos el df
 library(readr)
 rawsinadef2 <- read_delim("C:/Users/rojas/Google Drive/Documentos personales/Covid-19 Chimbote/fallecidos_sinadef.csv", 
