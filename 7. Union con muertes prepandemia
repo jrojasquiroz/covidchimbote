@@ -1,0 +1,57 @@
+#[RESULTADO] muertespandemiaNV_18marzo
+#Ahora añadimos muertes de 2019 al archivo creado
+#con muertes de 2020-2021 para que sea más fácil graficar
+
+#1. Al df con datos actuales de muertes por todas las causas
+#(en este caso, archivo descargado el 18 de marzo) le añadimos una
+#columna con el n° de orden de cada fila. Esto para luego poder unir 
+#el otro df con base en esta columna.
+mediamovil_mp$Orden = seq(1,441)
+
+#2. Importo el archivo que había conseguido con las muertes de 2019
+muertes2019NV <- read_excel("C:/Users/rojas/Google Drive/Documentos personales/Covid-19 Chimbote/muertes2019NV.xlsx", 
+                            +     col_types = c("date", "numeric", "numeric"))
+> View(muertes2019NV)
+  #2.1. Le añadimos una columna con el n° de orden
+  muertes2019NV$Orden = seq (1,362)
+  #Me quedo solo con dos columnas: Muertes y N° de orden
+  muertes2019NV <- muertes2019NV [c("NumMuertes","Orden")]
+  #2.2. Ahora pruebo con duplicar filas hacia abajo, debería tener 362*2 filas
+  #Para ello primero voy a duplicar el df "muertes2019NV"
+  muertes2019NVdos <- muertes2019NV
+  #Y ahora uno ambos
+  muertes2019ok <- rbind(muertes2019NV, muertes2019NVdos) #haber creado la columna "Orden" me permite corroborar que el duplicado se hizo correctamente
+  muertes2019ok <- muertes2019ok [c("NumMuertes")]
+  #Ahora si creamos la variable Orden "oficial"
+  muertes2019ok$Orden = seq(1,724)
+  #Y le cambiamos el nombre a la columna del n° de muertes
+  names(muertes2019ok) <- c("NumMuertes_2019","Orden")
+  #Ya podemos borrar los df que no nos servirán
+  rm(muertes2019NV, muertes2019NVdos)  
+  
+#3. Ahora uniremos "muertes2019ok" con "mediamovil_mp" tomando como referencia
+#la columna "Orden"
+marzo18NV <- merge(mediamovil_mp, muertes2019ok, by="Orden")
+#Eliminamos lo que ya no nos sirve
+rm(muertes2019ok)
+
+#4. Ahora sólo nos queda crear la media móvil de 2019
+library("tidyverse")
+library("lubridate")
+library("fpp2")
+library("zoo")
+library("dplyr")
+library("tidyr")
+
+muertespandemiaNV_18marzo <- marzo18NV %>%
+  select(Fecha, NumMuertes, ContagiosSieteDias, NumMuertes_2019 ) %>%
+  mutate(MediaMovil_2019 = rollmean(NumMuertes_2019, k = 7, fill = NA),)
+
+tail(muertespandemiaNV_18marzo)
+  #4.1. Le quitamos las últimas filas para que en el gráfico se vea mejor 
+  muertespandemiaNV_18marzo = muertespandemiaNV_18marzo [-c(439:441),] #importante la coma
+  
+#5. Exportamos para usar en Jupyter
+library(rio)
+
+export(muertespandemiaNV_18marzo, "muertespandemiaNV_18marzo.xlsx")
