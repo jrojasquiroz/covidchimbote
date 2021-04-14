@@ -6,12 +6,12 @@
 #(en este caso, archivo descargado el 18 de marzo) le añadimos una
 #columna con el n° de orden de cada fila. Esto para luego poder unir 
 #el otro df con base en esta columna.
-mediamovil_mp$Orden = seq(1,441)
+mediamovil_mp$Orden = seq(1,467)
 
 #2. Importo el archivo que había conseguido con las muertes de 2019
+library(readxl)
 muertes2019NV <- read_excel("C:/Users/rojas/Google Drive/Documentos personales/Covid-19 Chimbote/muertes2019NV.xlsx", 
-                            +     col_types = c("date", "numeric", "numeric"))
-> View(muertes2019NV)
+                            col_types = c("date", "numeric", "numeric"))
   #2.1. Le añadimos una columna con el n° de orden
   muertes2019NV$Orden = seq (1,362)
   #Me quedo solo con dos columnas: Muertes y N° de orden
@@ -31,7 +31,7 @@ muertes2019NV <- read_excel("C:/Users/rojas/Google Drive/Documentos personales/C
   
 #3. Ahora uniremos "muertes2019ok" con "mediamovil_mp" tomando como referencia
 #la columna "Orden"
-marzo18NV <- merge(mediamovil_mp, muertes2019ok, by="Orden")
+abril13NV <- merge(mediamovil_mp, muertes2019ok, by="Orden")
 #Eliminamos lo que ya no nos sirve
 rm(muertes2019ok)
 
@@ -43,15 +43,15 @@ library("zoo")
 library("dplyr")
 library("tidyr")
 
-muertespandemiaNV_18marzo <- marzo18NV %>%
+muertespandemiaNV_13abril <- abril13NV %>%
   select(Fecha, NumMuertes, ContagiosSieteDias, NumMuertes_2019 ) %>%
   mutate(MediaMovil_2019 = rollmean(NumMuertes_2019, k = 7, fill = NA),)
 
-tail(muertespandemiaNV_18marzo)
+tail(muertespandemiaNV_13abril)
   #4.1. Le quitamos las últimas filas para que en el gráfico se vea mejor 
-  muertespandemiaNV_18marzo = muertespandemiaNV_18marzo [-c(439:441),] #importante la coma
+  muertespandemiaNV_07abril = muertespandemiaNV_07abril [-c(456:458),] #importante la coma
   
 #5. Exportamos para usar en Jupyter
 library(rio)
 
-export(muertespandemiaNV_18marzo, "muertespandemiaNV_18marzo.xlsx")
+export(muertespandemiaNV_13abril, "muertespandemiaNV_13abril.xlsx")
